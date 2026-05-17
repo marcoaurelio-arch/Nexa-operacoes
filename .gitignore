@@ -1,0 +1,69 @@
+# ============================================
+# NEXA-GROWTH — .gitignore institucional
+# ============================================
+
+# --- Credenciais e segredos ---
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+secrets.json
+service-account*.json
+
+# --- Sistema Operacional ---
+.DS_Store
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# --- IDEs e editores ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- Logs ---
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- Node / Build ---
+node_modules/
+dist/
+build/
+.cache/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+
+# --- Excel/Office temporários ---
+~$*.xlsx
+~$*.docx
+~$*.pptx
+
+# --- n8n local ---
+.n8n/
+n8n-data/
+
+# --- Backups e arquivos temporários ---
+*.bak
+*.tmp
+*.temp
+tmp/
+temp/
+
+# --- Notion exports ---
+Export-*.zip
+
+# --- Dados sensíveis (LGPD) ---
+/CRM/Contatos/dados-reais/
+/SDR/Listas-Prospects/dados-reais/
