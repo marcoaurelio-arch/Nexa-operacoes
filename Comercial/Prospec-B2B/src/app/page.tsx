@@ -40,8 +40,8 @@ export default function Home() {
             </span>
           </div>
           <nav className="flex items-center gap-4 text-sm text-zinc-600 dark:text-zinc-400">
-            <Link href="/prospec" className="hover:text-zinc-900 dark:hover:text-zinc-50">
-              Prospecção
+            <Link href="/leads/new" className="hover:text-zinc-900 dark:hover:text-zinc-50">
+              Novo lead
             </Link>
             <Link href="/login" className="hover:text-zinc-900 dark:hover:text-zinc-50">
               Entrar
