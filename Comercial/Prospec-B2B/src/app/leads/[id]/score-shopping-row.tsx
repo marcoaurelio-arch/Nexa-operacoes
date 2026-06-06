@@ -1,9 +1,12 @@
 'use client'
 
 import { useActionState } from 'react'
+import Link from 'next/link'
+import { addToPipeline, type AddToPipelineState } from '../../pipeline/actions'
 import { scoreLeadAction, type ScoreState } from './actions'
 
 const initialState: ScoreState = { status: 'idle' }
+const initialPipeline: AddToPipelineState = { status: 'idle' }
 
 const RECOMMENDATION_LABEL: Record<string, string> = {
   prioritize: 'Priorizar',
@@ -62,6 +65,10 @@ export function ScoreShoppingRow({ leadId, shopping, existingScore }: Props) {
     scoreLeadAction,
     initialState,
   )
+  const [pipelineState, pipelineAction, pipelinePending] = useActionState(
+    addToPipeline,
+    initialPipeline,
+  )
 
   const score = state.status === 'ok' ? state.score : existingScore?.score
   const factors = (existingScore?.factors as StoredFactors | null) ?? null
@@ -104,21 +111,44 @@ export function ScoreShoppingRow({ leadId, shopping, existingScore }: Props) {
             </div>
           )}
 
-          <form action={formAction}>
-            <input type="hidden" name="lead_id" value={leadId} />
-            <input type="hidden" name="shopping_id" value={shopping.id} />
-            <button
-              type="submit"
-              disabled={pending}
-              className="rounded-md border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-900 transition hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-800"
-            >
-              {pending
-                ? 'Calculando…'
-                : existingScore || state.status === 'ok'
-                  ? 'Recalcular'
-                  : 'Calcular score'}
-            </button>
-          </form>
+          <div className="flex flex-col gap-1.5">
+            <form action={formAction}>
+              <input type="hidden" name="lead_id" value={leadId} />
+              <input type="hidden" name="shopping_id" value={shopping.id} />
+              <button
+                type="submit"
+                disabled={pending}
+                className="w-full rounded-md border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-900 transition hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:text-zinc-50 dark:hover:bg-zinc-800"
+              >
+                {pending
+                  ? 'Calculando…'
+                  : existingScore || state.status === 'ok'
+                    ? 'Recalcular'
+                    : 'Calcular score'}
+              </button>
+            </form>
+
+            {pipelineState.status === 'ok' ? (
+              <Link
+                href={`/pipeline/${pipelineState.opportunityId}`}
+                className="rounded-md bg-emerald-600 px-3 py-1.5 text-center text-xs font-medium text-white transition hover:bg-emerald-700"
+              >
+                Abrir no pipeline →
+              </Link>
+            ) : (
+              <form action={pipelineAction}>
+                <input type="hidden" name="lead_id" value={leadId} />
+                <input type="hidden" name="shopping_id" value={shopping.id} />
+                <button
+                  type="submit"
+                  disabled={pipelinePending}
+                  className="w-full rounded-md bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
+                >
+                  {pipelinePending ? 'Adicionando…' : '+ Pipeline'}
+                </button>
+              </form>
+            )}
+          </div>
         </div>
       </div>
 

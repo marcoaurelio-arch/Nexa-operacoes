@@ -46,6 +46,12 @@ export default async function LeadsPage() {
           </div>
           <div className="flex items-center gap-4 text-sm">
             <Link
+              href="/pipeline"
+              className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50"
+            >
+              Pipeline
+            </Link>
+            <Link
               href="/shoppings"
               className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50"
             >

@@ -6,6 +6,46 @@
 export type ShoppingStatus = 'active' | 'planning' | 'inactive'
 export type ProfileRole = 'admin' | 'manager' | 'sales'
 
+export type OpportunityStage =
+  | 'new'
+  | 'qualified'
+  | 'contacted'
+  | 'meeting'
+  | 'proposal'
+  | 'negotiation'
+  | 'won'
+  | 'lost'
+
+export type ActivityKind =
+  | 'note'
+  | 'email'
+  | 'call'
+  | 'whatsapp'
+  | 'meeting'
+  | 'stage_change'
+
+export const STAGE_ORDER: OpportunityStage[] = [
+  'new',
+  'qualified',
+  'contacted',
+  'meeting',
+  'proposal',
+  'negotiation',
+  'won',
+  'lost',
+]
+
+export const STAGE_LABEL: Record<OpportunityStage, string> = {
+  new: 'Novo',
+  qualified: 'Qualificado',
+  contacted: 'Contatado',
+  meeting: 'Reunião',
+  proposal: 'Proposta',
+  negotiation: 'Negociação',
+  won: 'Ganho',
+  lost: 'Perdido',
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -129,6 +169,56 @@ export type Database = {
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['lead_scores']['Insert']>
+        Relationships: []
+      }
+      opportunities: {
+        Row: {
+          id: string
+          lead_id: string
+          shopping_id: string
+          owner_id: string | null
+          stage: OpportunityStage
+          expected_close_at: string | null
+          expected_rent_cents: number | null
+          loss_reason: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          lead_id: string
+          shopping_id: string
+          owner_id?: string | null
+          stage?: OpportunityStage
+          expected_close_at?: string | null
+          expected_rent_cents?: number | null
+          loss_reason?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['opportunities']['Insert']>
+        Relationships: []
+      }
+      activities: {
+        Row: {
+          id: string
+          opportunity_id: string
+          author_id: string | null
+          kind: ActivityKind
+          content: string | null
+          metadata: Record<string, unknown> | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          opportunity_id: string
+          author_id?: string | null
+          kind: ActivityKind
+          content?: string | null
+          metadata?: Record<string, unknown> | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['activities']['Insert']>
         Relationships: []
       }
       profiles: {
