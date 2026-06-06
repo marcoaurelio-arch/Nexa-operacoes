@@ -110,9 +110,12 @@ export default async function LeadsPage() {
                     className="border-t border-zinc-100 dark:border-zinc-800"
                   >
                     <td className="px-4 py-3">
-                      <div className="font-medium text-zinc-900 dark:text-zinc-50">
+                      <Link
+                        href={`/leads/${lead.id}`}
+                        className="font-medium text-zinc-900 hover:underline dark:text-zinc-50"
+                      >
                         {lead.trade_name}
-                      </div>
+                      </Link>
                       {lead.legal_name &&
                         lead.legal_name !== lead.trade_name && (
                           <div className="text-xs text-zinc-500">

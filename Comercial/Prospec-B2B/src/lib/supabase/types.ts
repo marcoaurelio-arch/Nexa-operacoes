@@ -107,6 +107,30 @@ export type Database = {
         Update: Partial<Database['public']['Tables']['shoppings']['Insert']>
         Relationships: []
       }
+      lead_scores: {
+        Row: {
+          id: string
+          lead_id: string
+          shopping_id: string
+          score: number
+          rationale: string | null
+          model: string | null
+          factors: Record<string, unknown> | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          lead_id: string
+          shopping_id: string
+          score: number
+          rationale?: string | null
+          model?: string | null
+          factors?: Record<string, unknown> | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['lead_scores']['Insert']>
+        Relationships: []
+      }
       profiles: {
         Row: {
           id: string
