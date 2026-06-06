@@ -12,9 +12,8 @@ export default function NewLeadPage() {
           Novo lead
         </h1>
         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-          Cole o CNPJ da marca. Buscamos os dados da Receita via BrasilAPI e
-          montamos um esboço do lead. A gravação no banco será habilitada
-          assim que o Supabase estiver conectado.
+          Cole o CNPJ da marca. Buscamos os dados da Receita via BrasilAPI,
+          montamos o esboço, e você confirma pra gravar em <code>leads</code>.
         </p>
 
         <div className="mt-8">
