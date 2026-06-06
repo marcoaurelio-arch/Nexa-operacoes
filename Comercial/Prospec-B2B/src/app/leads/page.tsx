@@ -44,7 +44,13 @@ export default async function LeadsPage() {
               Leads
             </h1>
           </div>
-          <div className="flex items-center gap-3 text-sm">
+          <div className="flex items-center gap-4 text-sm">
+            <Link
+              href="/shoppings"
+              className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-50"
+            >
+              Shoppings
+            </Link>
             <Link
               href="/leads/new"
               className="rounded-md bg-zinc-900 px-3 py-1.5 font-medium text-white transition hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"

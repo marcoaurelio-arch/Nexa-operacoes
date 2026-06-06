@@ -3,6 +3,9 @@
  * For full generated types, run `supabase gen types typescript` after the
  * Supabase CLI is wired up.
  */
+export type ShoppingStatus = 'active' | 'planning' | 'inactive'
+export type ProfileRole = 'admin' | 'manager' | 'sales'
+
 export type Database = {
   public: {
     Tables: {
@@ -56,12 +59,60 @@ export type Database = {
         Update: Partial<Database['public']['Tables']['leads']['Insert']>
         Relationships: []
       }
+      shoppings: {
+        Row: {
+          id: string
+          name: string
+          slug: string
+          city: string
+          state: string
+          cep: string | null
+          address: string | null
+          latitude: number | null
+          longitude: number | null
+          gla_sqm: number | null
+          vacancy_sqm: number | null
+          vacancy_rate: number | null
+          monthly_footfall: number | null
+          avg_ticket_cents: number | null
+          audience_class: string[] | null
+          audience_profile: Record<string, unknown> | null
+          current_mix: Record<string, unknown> | null
+          status: ShoppingStatus
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          slug: string
+          city: string
+          state: string
+          cep?: string | null
+          address?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          gla_sqm?: number | null
+          vacancy_sqm?: number | null
+          vacancy_rate?: number | null
+          monthly_footfall?: number | null
+          avg_ticket_cents?: number | null
+          audience_class?: string[] | null
+          audience_profile?: Record<string, unknown> | null
+          current_mix?: Record<string, unknown> | null
+          status?: ShoppingStatus
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['shoppings']['Insert']>
+        Relationships: []
+      }
       profiles: {
         Row: {
           id: string
           full_name: string | null
           email: string
-          role: 'admin' | 'manager' | 'sales'
+          role: ProfileRole
           created_at: string
           updated_at: string
         }
@@ -69,7 +120,7 @@ export type Database = {
           id: string
           full_name?: string | null
           email: string
-          role?: 'admin' | 'manager' | 'sales'
+          role?: ProfileRole
           created_at?: string
           updated_at?: string
         }
