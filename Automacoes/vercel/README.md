@@ -54,17 +54,40 @@ await vercel.addDnsRecord("nexa.com.br", {
 });
 ```
 
-## Caso de uso imediato
+## Caso de uso imediato — sincronizar segredos Zaper
 
-Setar env vars do Zaper no projeto `nexa-operacoes` (prj_Pshs6btl2Kie46ua9l4wngN8mlJV):
+Script CLI pronto: lê `ZAPER_API_KEY`, `ZAPER_API_BASE_URL` e (opcional)
+`ZAPER_WEBHOOK_SECRET` do ambiente e faz upsert no projeto Vercel.
+Descobre o team ID automaticamente via `/v2/teams`.
 
-```ts
-await vercel.upsertEnvVar("prj_Pshs6btl2Kie46ua9l4wngN8mlJV", {
-  key: "ZAPER_API_KEY",
-  value: process.env.ZAPER_API_KEY!,
-  type: "sensitive",  // criptografado, não exibido no painel
-  target: ["production", "preview"],
-});
+```bash
+cd Automacoes/vercel
+npm install
+
+# Dry run (mostra o que seria escrito, não persiste)
+VERCEL_TOKEN=vcp_... \
+ZAPER_API_KEY=pn_... \
+npm run sync-zaper-env:dry
+
+# Pra valer
+VERCEL_TOKEN=vcp_... \
+ZAPER_API_KEY=pn_... \
+ZAPER_API_BASE_URL=https://api.app.zaperchat.com \
+npm run sync-zaper-env
+```
+
+Output esperado:
+```
+✓ Team: marcoaurelio-archs-projects (team_..., slug=marcoaurelio-archs-projects)
+✓ Project: nexa-operacoes (prj_Pshs6btl2Kie46ua9l4wngN8mlJV)
+
+Sincronizando 2 env var(s):
+  • ZAPER_API_KEY            [sensitive] → production, preview
+  • ZAPER_API_BASE_URL       [plain] → production, preview, development
+  ✓ upsert ZAPER_API_KEY
+  ✓ upsert ZAPER_API_BASE_URL
+
+✅ Pronto. Dispare um novo deploy pra propagar as env vars novas.
 ```
 
 ## Especificações de endpoints

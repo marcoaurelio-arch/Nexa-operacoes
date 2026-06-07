@@ -12,7 +12,9 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "node --test --import tsx tests/**/*.test.ts"
+    "test": "node --test --import tsx tests/**/*.test.ts",
+    "sync-zaper-env": "tsx src/scripts/sync-zaper-env.ts",
+    "sync-zaper-env:dry": "tsx src/scripts/sync-zaper-env.ts --dry-run"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
