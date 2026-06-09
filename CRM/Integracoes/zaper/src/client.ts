@@ -16,9 +16,13 @@ import {
   ZaperError,
   ZaperMessage,
   ZaperPanel,
+  ZaperPanelCard,
+  ZaperPanelStep,
   ZaperPortfolio,
   ZaperRequestOptions,
   ZaperSession,
+  ZaperSessionMessage,
+  ZaperSessionNote,
   ZaperTag,
   ZaperTemplate,
 } from "./types.js";
@@ -187,6 +191,24 @@ export class ZaperClient {
     });
   }
 
+  /** ⚠️ Requer token com escopo admin/CRM. */
+  listPanelCards(
+    panelId: string,
+    query: PageQuery = {},
+  ): Promise<Paginated<ZaperPanelCard>> {
+    return this.request<Paginated<ZaperPanelCard>>({
+      path: `/crm/v1/panel/${encodeURIComponent(panelId)}/card`,
+      query: query as Record<string, string | number | boolean | undefined>,
+    });
+  }
+
+  /** ⚠️ Requer token com escopo admin/CRM. */
+  listPanelSteps(panelId: string): Promise<Paginated<ZaperPanelStep>> {
+    return this.request<Paginated<ZaperPanelStep>>({
+      path: `/crm/v1/panel/${encodeURIComponent(panelId)}/steps`,
+    });
+  }
+
   // --- Sessões / Atendimentos ------------------------------------------
 
   listSessions(
@@ -201,6 +223,47 @@ export class ZaperClient {
   getSession(id: string): Promise<ZaperSession> {
     return this.request<ZaperSession>({
       path: `/chat/v1/session/${encodeURIComponent(id)}`,
+    });
+  }
+
+  /** Mensagens de uma sessão — caminho preferido (vs `listMessages({sessionId})`). */
+  listSessionMessages(
+    sessionId: string,
+    query: PageQuery = {},
+  ): Promise<Paginated<ZaperSessionMessage>> {
+    return this.request<Paginated<ZaperSessionMessage>>({
+      path: `/chat/v1/session/${encodeURIComponent(sessionId)}/message`,
+      query: query as Record<string, string | number | boolean | undefined>,
+    });
+  }
+
+  listSessionNotes(
+    sessionId: string,
+    query: PageQuery = {},
+  ): Promise<Paginated<ZaperSessionNote>> {
+    return this.request<Paginated<ZaperSessionNote>>({
+      path: `/chat/v1/session/${encodeURIComponent(sessionId)}/note`,
+      query: query as Record<string, string | number | boolean | undefined>,
+    });
+  }
+
+  /** ⚠️ Requer token com escopo admin/atendimento. */
+  completeSession(sessionId: string): Promise<unknown> {
+    return this.request({
+      method: "POST",
+      path: `/chat/v1/session/${encodeURIComponent(sessionId)}/complete`,
+    });
+  }
+
+  /** ⚠️ Requer token com escopo admin/atendimento. */
+  transferSession(
+    sessionId: string,
+    input: { toUserId?: string; toDepartmentId?: string; reason?: string },
+  ): Promise<unknown> {
+    return this.request({
+      method: "POST",
+      path: `/chat/v1/session/${encodeURIComponent(sessionId)}/transfer`,
+      body: input,
     });
   }
 

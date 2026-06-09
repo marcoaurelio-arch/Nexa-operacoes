@@ -194,8 +194,30 @@ export interface ZaperSession {
   id: string;
   createdAt: string;
   updatedAt: string;
+  startAt?: string;
+  endAt?: string | null;
   contactId?: string;
   status?: string;
+  [k: string]: unknown;
+}
+
+export interface ZaperSessionMessage {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  timestamp: string;
+  type: "TEXT" | "IMAGE" | "AUDIO" | "VIDEO" | "DOCUMENT" | "TEMPLATE" | string;
+  senderId: string | null;
+  status?: string;
+  [k: string]: unknown;
+}
+
+export interface ZaperSessionNote {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  text?: string;
+  authorId?: string;
   [k: string]: unknown;
 }
 
@@ -215,7 +237,31 @@ export interface ZaperPanel {
   id: string;
   createdAt: string;
   updatedAt: string;
+  companyId?: string;
+  archived?: boolean;
   name?: string;
+  [k: string]: unknown;
+}
+
+/** Card de painel — só legível com token de escopo admin/CRM. */
+export interface ZaperPanelCard {
+  id: string;
+  panelId: string;
+  stepId?: string;
+  contactId?: string;
+  title?: string;
+  createdAt: string;
+  updatedAt: string;
+  [k: string]: unknown;
+}
+
+export interface ZaperPanelStep {
+  id: string;
+  panelId: string;
+  name?: string;
+  order?: number;
+  createdAt: string;
+  updatedAt: string;
   [k: string]: unknown;
 }
 

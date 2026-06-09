@@ -229,22 +229,35 @@ Schema do descriptor: `{ event: string, description: string }`
 | Método | Path | Descrição |
 |--------|------|-----------|
 | GET    | `/crm/v1/panel` | Listar painéis (kanban) |
+| GET    | `/crm/v1/panel/{id}` | Detalhes do painel (`companyId`, `archived`, ...) |
 | GET    | `/chat/v1/session` | Listar atendimentos |
+| GET    | `/chat/v1/session/{id}` | Detalhes (`startAt`, `endAt`) |
+| GET    | `/chat/v1/session/{id}/message` | **Mensagens da sessão** (paginadas) — caminho preferido |
+| GET    | `/chat/v1/session/{id}/note` | Notas da sessão (paginadas) |
+| GET    | `/chat/v1/message?sessionId={id}` | Alternativa às mensagens da sessão |
 | GET    | `/chat/v1/template` | Listar templates HSM |
 | GET    | `/chat/v1/message` | Listar mensagens (com filtros) |
 | GET    | `/core/v1/tag` | Listar tags (**array direto, sem paginação**) |
 | GET    | `/core/v1/portfolio` | Listar portfolios |
 
+**Schema de `ZaperSessionMessage`:** `{ id, createdAt, updatedAt, timestamp, type: "TEXT"|"IMAGE"|..., senderId, ... }`
+
 ### Existem mas exigem outro escopo de token (401/403)
+
+> O token "operacional" típico (que lê sessions/messages) **não** alcança esses. Pra acessar:
+> rotacionar pra um token com escopo **Admin** ou **CRM** no painel Zaper.
 
 | Path | Provável uso |
 |------|--------------|
+| `/crm/v1/panel/{id}/card` | Cards do painel (kanban) |
+| `/crm/v1/panel/{id}/steps` | Etapas/colunas do painel |
+| `/crm/v1/panel/{id}/note(s)`, `/stage`, `/column` | Anotações e variações |
+| `/crm/v1/card?panelId={id}`, `/crm/v1/step?panelId={id}` | Listas filtradas |
 | `/crm/v1/contact` | CRM dedicado (separado de `/core/v1/contact`?) |
-| `/crm/v1/deal` | Deals/oportunidades |
-| `/crm/v1/opportunity` | Idem |
-| `/core/v1/channel` | Canais cadastrados (números WhatsApp) |
-| `/core/v1/customfield` | Campos customizados |
-| `/core/v1/template` | Templates (core, diferente do `/chat/v1/template`) |
+| `/crm/v1/deal`, `/crm/v1/opportunity` | Deals/oportunidades |
+| `/chat/v1/session/{id}/complete` | Finalizar atendimento (POST) |
+| `/chat/v1/session/{id}/transfer` | Transferir atendimento (POST) |
+| `/core/v1/channel`, `/core/v1/customfield`, `/core/v1/template` | Configurações |
 | `/core/v1/user`, `/core/v1/me`, `/core/v1/company` | Identidade |
 | `/chat/v1/conversation`, `/chat/v1/chat` | Conversa (sinônimo de sessão?) |
 | `/chat/v1/file` | Upload/listagem de arquivos |
