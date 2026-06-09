@@ -197,20 +197,57 @@ Todos retornam HTTP 200 em sucesso. Status detalhado em `GET /chat/v1/message/{i
 - Allowlist de IPs (pedir range pro suporte Zaper)
 - mTLS no balancer
 
-### Eventos conhecidos (confirmar via API)
+### Eventos oficiais (16 no total — confirmados via `GET /core/v1/webhook/event`)
 
-Da doc explícita: `CONTACT_UPDATE`.
-Esperados (a confirmar): `CONTACT_CREATE`, `MESSAGE_RECEIVED`, `MESSAGE_SENT`, `MESSAGE_STATUS`.
+Schema do descriptor: `{ event: string, description: string }`
 
-Rode no Postman/cURL pra ter a lista oficial:
-```bash
-curl -H "Authorization: Bearer $ZAPER_API_KEY" \
-  https://api.wts.chat/core/v1/webhook/event
-```
+| Módulo | Evento | Descrição |
+|--------|--------|-----------|
+| Atendimentos | `SESSION_NEW` | Atendimento criado |
+| Atendimentos | `SESSION_UPDATE` | Atendimento alterado |
+| Atendimentos | `SESSION_COMPLETE` | Atendimento concluído |
+| Mensagens | `MESSAGE_RECEIVED` | Mensagem recebida |
+| Mensagens | `MESSAGE_SENT` | Mensagem enviada |
+| Mensagens | `MESSAGE_UPDATED` | Mensagem atualizada |
+| Contatos | `CONTACT_NEW` | Contato criado |
+| Contatos | `CONTACT_UPDATE` | Contato alterado |
+| Contatos | `CONTACT_TAG_UPDATE` | Etiqueta do contato alterada |
+| Pagamentos | `PAYMENT_NEW` | Pagamento criado |
+| Pagamentos | `PAYMENT_UPDATE` | Pagamento alterado |
+| Painel | `PANEL_CARD_NEW` | Card criado |
+| Painel | `PANEL_CARD_UPDATE` | Card alterado |
+| Painel | `PANEL_CARD_STEP_CHANGE` | Card movido de etapa |
+| Painel | `PANEL_CARD_NOTE_NEW` | Anotação criada |
+| Painel | `PANEL_CARD_NOTE_UPDATE` | Anotação alterada |
+
+> **Para o Nexa, os mais relevantes** são: `CONTACT_*`, `MESSAGE_*`, `PANEL_CARD_*` (sincronizam com `lead`, `lead_contacts`, `activities` e `opportunities` do Prospec-B2B).
 
 ## Pontos em aberto (a validar com chamada real)
 
 - Schema exato dos responses de criar/atualizar contato (HTTP 200, body não documentado fora do "Try It").
 - Schema dos responses de envio de mensagem (id retornado? envelope?).
-- Lista completa de eventos via `/core/v1/webhook/event`.
+- ~~Lista completa de eventos via `/core/v1/webhook/event`~~ ✅ confirmada (16 eventos, ver tabela acima).
+- Schema do `content` dos webhooks de **Sessões**, **Pagamentos** e **Painel** (só `CONTACT_UPDATE` tem exemplo na doc).
 - Endpoints `/crm/...` — não cobertos na doc consultada.
+- Módulo **Pagamentos** — não documentado nos endpoints REST; investigar.
+- Módulo **Painel (kanban)** — endpoints REST pra criar/mover cards via API: a explorar.
+
+## Formato de erro
+
+Em falha, a API retorna envelope:
+
+```json
+{
+  "id": { "value": "uuid", "shortValue": "uuid8" },
+  "httpStatusCode": 401,
+  "version": null,
+  "environment": null,
+  "error": true,
+  "date": "2026-06-09T01:29:43.858661Z",
+  "key": "ERROR_UNAUTHORIZED",
+  "text": "Acesso negado",
+  "isUnsolvableError": false
+}
+```
+
+`key` é estável (string-enum-like); `text` é mensagem traduzida. Recomenda-se rotear erros pelo `key`.

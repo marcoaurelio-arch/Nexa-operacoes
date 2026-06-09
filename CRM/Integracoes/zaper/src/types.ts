@@ -142,8 +142,8 @@ export interface MessageStatus {
 // --- Webhooks -----------------------------------------------------------
 
 export interface WebhookEventDescriptor {
-  name: string;
-  description?: string;
+  event: string;
+  description: string;
 }
 
 export interface WebhookSubscription {
@@ -151,26 +151,44 @@ export interface WebhookSubscription {
   name: string;
   url: string;
   enabled: boolean;
-  events: string[];
+  events: KnownEventType[] | string[];
 }
 
 /** Envelope padrão de todos os webhooks. */
 export interface ZaperWebhookEnvelope<T = unknown> {
-  eventType: string;
+  eventType: KnownEventType | string;
   date: string;
   content: T;
 }
 
 export interface ContactUpdateWebhook
   extends ZaperWebhookEnvelope<ZaperContact> {
-  eventType: "CONTACT_UPDATE";
+  eventType: "CONTACT_UPDATE" | "CONTACT_NEW" | "CONTACT_TAG_UPDATE";
 }
 
-// Eventos confirmados na doc; lista completa via listWebhookEvents().
+/**
+ * Eventos oficiais retornados por `GET /core/v1/webhook/event` (16 no total).
+ * Agrupados por módulo.
+ */
 export type KnownEventType =
-  | "CONTACT_UPDATE"
-  | "CONTACT_CREATE"
+  // Atendimentos / Sessões
+  | "SESSION_NEW"
+  | "SESSION_UPDATE"
+  | "SESSION_COMPLETE"
+  // Mensagens
   | "MESSAGE_RECEIVED"
   | "MESSAGE_SENT"
-  | "MESSAGE_STATUS"
-  | (string & {});
+  | "MESSAGE_UPDATED"
+  // Contatos
+  | "CONTACT_NEW"
+  | "CONTACT_UPDATE"
+  | "CONTACT_TAG_UPDATE"
+  // Pagamentos
+  | "PAYMENT_NEW"
+  | "PAYMENT_UPDATE"
+  // Painel (pipeline kanban)
+  | "PANEL_CARD_NEW"
+  | "PANEL_CARD_UPDATE"
+  | "PANEL_CARD_STEP_CHANGE"
+  | "PANEL_CARD_NOTE_NEW"
+  | "PANEL_CARD_NOTE_UPDATE";
