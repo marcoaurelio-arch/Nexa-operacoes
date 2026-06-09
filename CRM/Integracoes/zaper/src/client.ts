@@ -176,6 +176,13 @@ export class ZaperClient {
     });
   }
 
+  deleteWebhookSubscription(id: string): Promise<unknown> {
+    return this.request({
+      method: "DELETE",
+      path: `/core/v1/webhook/subscription/${encodeURIComponent(id)}`,
+    });
+  }
+
   // --- Painel / CRM (kanban) -------------------------------------------
 
   listPanels(query: PageQuery = {}): Promise<Paginated<ZaperPanel>> {
