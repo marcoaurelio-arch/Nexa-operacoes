@@ -1,43 +1,48 @@
 import Fastify from "fastify";
-import { createHmac, timingSafeEqual } from "node:crypto";
-import { ZaperWebhookEvent } from "./types.js";
+import { ZaperWebhookEnvelope } from "./types.js";
 
 const PORT = Number(process.env.PORT ?? 3000);
-const WEBHOOK_SECRET = process.env.ZAPER_WEBHOOK_SECRET ?? "";
 
 const app = Fastify({ logger: true });
 
+/**
+ * Endpoint pra receber webhooks da Zaper (WTS Chat).
+ *
+ * Doc oficial NÃO descreve assinatura criptográfica (HMAC) — se a Zaper
+ * adicionar isso depois, plugar verificação aqui. Por enquanto, recomenda-se
+ * proteger o endpoint via:
+ *  - URL com path secreto (ex: /webhooks/zaper/<random>)
+ *  - allowlist de IP de origem da Zaper
+ *  - mTLS no balancer
+ */
 app.post("/webhooks/zaper", async (req, reply) => {
-  if (WEBHOOK_SECRET && !verifySignature(req.headers, req.rawBody as string)) {
-    return reply.code(401).send({ error: "invalid signature" });
-  }
+  const event = req.body as ZaperWebhookEnvelope;
 
-  const event = req.body as ZaperWebhookEvent;
-  // TODO: rotear para o domínio Nexa
-  // - message.received → criar/atualizar conversa
-  // - message.sent     → registrar envio
-  // - contact.created  → sincronizar com Prospec-B2B
-  req.log.info({ type: event.type }, "zaper event received");
+  req.log.info(
+    { eventType: event.eventType, date: event.date },
+    "zaper event received",
+  );
+
+  switch (event.eventType) {
+    case "CONTACT_UPDATE":
+    case "CONTACT_CREATE":
+      // TODO: sincronizar contato no Nexa
+      break;
+    case "MESSAGE_RECEIVED":
+      // TODO: criar/atualizar conversa, acionar bot/handoff
+      break;
+    case "MESSAGE_SENT":
+    case "MESSAGE_STATUS":
+      // TODO: registrar status de envio
+      break;
+    default:
+      req.log.warn({ eventType: event.eventType }, "unknown event type");
+  }
 
   return reply.code(200).send({ ok: true });
 });
 
 app.get("/health", async () => ({ ok: true }));
-
-function verifySignature(
-  headers: Record<string, unknown>,
-  rawBody: string,
-): boolean {
-  // TODO: confirmar nome do header e algoritmo após doc da Zaper
-  const sig = String(headers["x-zaper-signature"] ?? "");
-  if (!sig || !rawBody) return false;
-  const expected = createHmac("sha256", WEBHOOK_SECRET)
-    .update(rawBody)
-    .digest("hex");
-  const a = Buffer.from(sig);
-  const b = Buffer.from(expected);
-  return a.length === b.length && timingSafeEqual(a, b);
-}
 
 app.listen({ port: PORT, host: "0.0.0.0" }).catch((err) => {
   app.log.error(err);

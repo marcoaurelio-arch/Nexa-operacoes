@@ -1,51 +1,216 @@
-# Zaper Chat — Specs da API
+# Zaper / WTS Chat — Specs da API
 
-Espelho da documentação oficial do Zaper Chat (`api.app.zaperchat.com`), extraída do painel.
+Doc oficial: https://flwchat.readme.io/ (login obrigatório)
+Base URL: **`https://api.wts.chat`** (não é `api.app.zaperchat.com`)
 
-> **A preencher.** A doc da Zaper não é pública. Cole aqui as seções tiradas de **Painel Zaper → Integrações → API / Webhooks / Desenvolvedores**.
+> Zaper Chat = WTS Chat = FLW Chat (mesma API).
 
 ## Autenticação
 
-- Base URL: `https://api.app.zaperchat.com`
-- Header de auth: _(confirmar — Bearer? X-API-Key?)_
-- Chave: variável `ZAPER_API_KEY` (não commitar)
+```http
+Authorization: Bearer <ZAPER_API_KEY>
+Content-Type: application/json
+```
 
-## Endpoints
+Token permanente — gerar em **Ajustes → Integrações → API**.
 
-### Contatos
+## Estrutura modular
+
+Não há `/v1` global. Cada módulo tem seu prefixo e versionamento:
+
+- `/core/v1/...` — contatos, webhooks, configurações
+- `/core/v2/...` — endpoints novos (atualizar contato por id)
+- `/chat/v1/...` — envio e gestão de mensagens
+- `/crm/...` — (a explorar)
+
+## Contatos
 
 | Método | Path | Descrição |
 |--------|------|-----------|
-| GET    | _TODO_ | Listar contatos |
-| POST   | _TODO_ | Criar contato |
-| PATCH  | _TODO_ | Atualizar contato |
+| POST   | `/core/v1/contact` | Criar contato |
+| GET    | `/core/v1/contact/phonenumber/{phone}` | Buscar por telefone (E.164 com `+`) |
+| GET    | `/core/v2/contact/{id}` | Buscar por ID |
+| PUT    | `/core/v1/contact/phonenumber/{phone}` | Atualizar por telefone (com `fields`-mask) |
+| PUT    | `/core/v2/contact/{id}` | Atualizar por ID |
 
-**Schema (request/response):** _colar aqui_
+**Body POST `/core/v1/contact`:**
+```json
+{
+  "name": "João da Silva",
+  "phoneNumber": "+5534999999999",
+  "email": "joao@email.com",
+  "instagram": "joaosilva",
+  "annotation": "Lead vindo do CRM",
+  "tagNames": ["Lead", "CRM"],
+  "portfolioNames": ["Comercial"],
+  "customFields": { "origem": "crm", "interesse": "agente_ia" },
+  "metadata": { "crmId": "12345", "origemIntegracao": "meu-crm" }
+}
+```
 
-### Mensagens
+**Body PUT (fields-mask):**
+```json
+{
+  "fields": ["name", "email", "metadata", "tagNames"],
+  "name": "João Atualizado",
+  "email": "joao.novo@email.com",
+  "tagNames": ["Lead Qualificado"],
+  "metadata": { "crmId": "12345", "statusCRM": "qualificado" }
+}
+```
+
+- `tagIds` tem precedência sobre `tagNames`.
+- Aceita também `portfolioIds`/`portfolioNames`, `sequenceIds`, `customFields`, `metadata`.
+
+## Mensagens — envio direto
+
+Todos retornam HTTP 200 em sucesso. Status detalhado em `GET /chat/v1/message/{id}/status`.
+
+| Método | Path | Tipo |
+|--------|------|------|
+| POST   | `/chat/v1/send/text` | Texto |
+| POST   | `/chat/v1/send/image` | Imagem |
+| POST   | `/chat/v1/send/audio` | Áudio |
+| POST   | `/chat/v1/send/video` | Vídeo |
+| POST   | `/chat/v1/send/document` | Documento |
+| POST   | `/chat/v1/send/template` | Template (HSM) |
+| POST   | `/chat/v1/message/send` | Genérico (segue regras do canal, auto-cria contato) |
+| GET    | `/chat/v1/message/{id}/status` | Consultar status |
+
+**Body texto:**
+```json
+{
+  "to": "+5534999999999",
+  "from": "+5534888888888",
+  "text": "Olá!",
+  "sessionId": "uuid-opcional",
+  "delayTyping": 3,
+  "callbackUrl": "https://...",
+  "senderId": "msg-12345"
+}
+```
+
+**Body mídia (image/audio/video/document):**
+```json
+{
+  "to": "+5534999999999",
+  "from": "+5534888888888",
+  "fileIdOrUrl": "https://.../arquivo.pdf",
+  "sessionId": "uuid-opcional",
+  "callbackUrl": "https://...",
+  "senderId": "doc-12345"
+}
+```
+
+`fileIdOrUrl`: URL pública OU ID de arquivo previamente uploadado.
+
+**Body template:**
+```json
+{
+  "to": "+5534999999999",
+  "from": "+5534888888888",
+  "templateId": "tpl_abc",
+  "parameters": { "nome": "João", "data": "10/06/2026" },
+  "fileIdOrUrl": "https://.../imagem.pdf",
+  "callbackUrl": "https://...",
+  "sessionId": "uuid-opcional",
+  "senderId": "template-12345",
+  "sessionMetadata": { "crmId": "12345", "origem": "crm" }
+}
+```
+
+**Body `/chat/v1/message/send` (genérico):**
+```json
+{
+  "from": "+5534888888888",
+  "to": "+5534999999999",
+  "body": { "text": "Olá!" },
+  "options": { "senderId": "msg-12345" }
+}
+```
+
+## Webhooks
+
+### Gerenciamento
 
 | Método | Path | Descrição |
 |--------|------|-----------|
-| POST   | _TODO_ | Enviar mensagem WhatsApp |
-| GET    | _TODO_ | Histórico por contato |
+| GET    | `/core/v1/webhook/event` | **Lista oficial de eventos** disponíveis |
+| GET    | `/core/v1/webhook/subscription` | Listar assinaturas |
+| POST   | `/core/v1/webhook/subscription` | Criar assinatura |
 
-### Pipelines / Funil
+**Body criar assinatura:**
+```json
+{
+  "name": "Integração CRM",
+  "url": "https://seudominio.com/webhooks/flw",
+  "enabled": true,
+  "events": ["CONTACT_UPDATE", "MESSAGE_RECEIVED"]
+}
+```
 
-_(se existir esse conceito no Zaper — confirmar)_
+### Envelope padrão de TODO webhook
 
-### Webhooks
+```json
+{
+  "eventType": "NOME_DO_EVENTO",
+  "date": "2026-06-07T18:42:35.4359934Z",
+  "content": { /* específico do evento */ }
+}
+```
 
-Eventos disponíveis (a confirmar):
+**Exemplo — `CONTACT_UPDATE`:**
+```json
+{
+  "eventType": "CONTACT_UPDATE",
+  "date": "2026-06-07T16:42:35.4359934Z",
+  "content": {
+    "id": "ed2b52f8-cf13-449b-b3d5-ae27051f4663",
+    "createdAt": "...",
+    "updatedAt": "...",
+    "companyId": "...",
+    "name": "John Raymond Legrasse",
+    "phonenumber": "+55|00000000000",
+    "phonenumberFormatted": "(00) 00000-0000",
+    "email": "email@example.com",
+    "instagram": null,
+    "annotation": "",
+    "tagsId": [],
+    "tags": [],
+    "status": "ACTIVE",
+    "origin": "CREATED_FROM_HUB",
+    "utm": null,
+    "customFieldValues": {},
+    "metadata": null
+  }
+}
+```
 
-- `message.received`
-- `message.sent`
-- `contact.created`
-- `contact.updated`
+### Assinatura criptográfica
 
-**Formato do payload:** _colar exemplo aqui_
-**Assinatura:** _header e algoritmo (provavelmente `X-Zaper-Signature` + HMAC-SHA256)_
+**Não documentada.** A doc atual descreve apenas:
+- POST + `application/json`
+- Envelope `eventType` / `date` / `content`
 
-## Postman / OpenAPI
+**Estratégias de segurança recomendadas** até a Zaper publicar HMAC:
+- URL com segredo aleatório no path (`/webhooks/zaper/<random32>`)
+- Allowlist de IPs (pedir range pro suporte Zaper)
+- mTLS no balancer
 
-- `openapi.yaml` — _a gerar_
-- `postman_collection.json` — _a gerar_
+### Eventos conhecidos (confirmar via API)
+
+Da doc explícita: `CONTACT_UPDATE`.
+Esperados (a confirmar): `CONTACT_CREATE`, `MESSAGE_RECEIVED`, `MESSAGE_SENT`, `MESSAGE_STATUS`.
+
+Rode no Postman/cURL pra ter a lista oficial:
+```bash
+curl -H "Authorization: Bearer $ZAPER_API_KEY" \
+  https://api.wts.chat/core/v1/webhook/event
+```
+
+## Pontos em aberto (a validar com chamada real)
+
+- Schema exato dos responses de criar/atualizar contato (HTTP 200, body não documentado fora do "Try It").
+- Schema dos responses de envio de mensagem (id retornado? envelope?).
+- Lista completa de eventos via `/core/v1/webhook/event`.
+- Endpoints `/crm/...` — não cobertos na doc consultada.

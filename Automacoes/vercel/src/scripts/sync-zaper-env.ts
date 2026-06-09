@@ -56,7 +56,7 @@ async function main() {
     {
       key: "ZAPER_API_BASE_URL",
       value:
-        process.env.ZAPER_API_BASE_URL ?? "https://api.app.zaperchat.com",
+        process.env.ZAPER_API_BASE_URL ?? "https://api.wts.chat",
       type: "plain",
       target: ["production", "preview", "development"],
     },
