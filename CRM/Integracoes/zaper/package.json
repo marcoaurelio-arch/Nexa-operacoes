@@ -15,7 +15,8 @@
     "start": "node dist/webhooks.js",
     "test": "node --test --import tsx tests/**/*.test.ts",
     "typecheck": "tsc --noEmit",
-    "discover": "tsx src/scripts/discover-endpoints.ts"
+    "discover": "tsx src/scripts/discover-endpoints.ts",
+    "discover:panel": "tsx src/scripts/discover-panel.ts"
   },
   "dependencies": {
     "fastify": "^4.28.0"

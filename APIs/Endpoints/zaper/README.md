@@ -222,6 +222,53 @@ Schema do descriptor: `{ event: string, description: string }`
 
 > **Para o Nexa, os mais relevantes** são: `CONTACT_*`, `MESSAGE_*`, `PANEL_CARD_*` (sincronizam com `lead`, `lead_contacts`, `activities` e `opportunities` do Prospec-B2B).
 
+## Endpoints adicionais descobertos (via probe)
+
+### Confirmados (200 OK)
+
+| Método | Path | Descrição |
+|--------|------|-----------|
+| GET    | `/crm/v1/panel` | Listar painéis (kanban) |
+| GET    | `/chat/v1/session` | Listar atendimentos |
+| GET    | `/chat/v1/template` | Listar templates HSM |
+| GET    | `/chat/v1/message` | Listar mensagens (com filtros) |
+| GET    | `/core/v1/tag` | Listar tags (**array direto, sem paginação**) |
+| GET    | `/core/v1/portfolio` | Listar portfolios |
+
+### Existem mas exigem outro escopo de token (401/403)
+
+| Path | Provável uso |
+|------|--------------|
+| `/crm/v1/contact` | CRM dedicado (separado de `/core/v1/contact`?) |
+| `/crm/v1/deal` | Deals/oportunidades |
+| `/crm/v1/opportunity` | Idem |
+| `/core/v1/channel` | Canais cadastrados (números WhatsApp) |
+| `/core/v1/customfield` | Campos customizados |
+| `/core/v1/template` | Templates (core, diferente do `/chat/v1/template`) |
+| `/core/v1/user`, `/core/v1/me`, `/core/v1/company` | Identidade |
+| `/chat/v1/conversation`, `/chat/v1/chat` | Conversa (sinônimo de sessão?) |
+| `/chat/v1/file` | Upload/listagem de arquivos |
+| `/core/v1/panel`, `/core/v2/panel`, `/core/v1/board`, `/core/v1/kanban`, `/core/v1/pipeline`, `/core/v1/card` | Aliases do Painel (CRM é o caminho oficial) |
+
+### Paginação padrão
+
+```json
+{
+  "items": [...],
+  "totalItems": 0,
+  "totalPages": 0,
+  "hasMorePages": false,
+  "pageNumber": 1,
+  "pageSize": 15,
+  "orderBy": "createdat",
+  "orderDirection": "desc"
+}
+```
+
+Query params suportados: `pageNumber`, `pageSize`, `orderBy`, `orderDirection`.
+
+**Exceção:** `/core/v1/tag` retorna array direto, sem envelope.
+
 ## Pontos em aberto (a validar com chamada real)
 
 - Schema exato dos responses de criar/atualizar contato (HTTP 200, body não documentado fora do "Try It").

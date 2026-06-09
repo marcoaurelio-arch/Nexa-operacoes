@@ -29,6 +29,27 @@ export class ZaperError extends Error {
   }
 }
 
+// --- Paginação ----------------------------------------------------------
+
+/** Envelope paginado padrão da WTS (vale pra quase todos os list endpoints). */
+export interface Paginated<T> {
+  items: T[];
+  totalItems: number;
+  totalPages: number;
+  hasMorePages: boolean;
+  pageNumber: number;
+  pageSize: number;
+  orderBy: string | null;
+  orderDirection: "asc" | "desc" | null;
+}
+
+export interface PageQuery {
+  pageNumber?: number;
+  pageSize?: number;
+  orderBy?: string;
+  orderDirection?: "asc" | "desc";
+}
+
 // --- Contatos -----------------------------------------------------------
 
 export interface ZaperContact {
@@ -137,6 +158,74 @@ export interface MessageStatus {
   readAt?: string;
   failedAt?: string;
   errorReason?: string;
+}
+
+// --- Recursos descobertos via /webhook/event + endpoint discovery -------
+
+export interface ZaperTag {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  name?: string;
+  color?: string;
+  [k: string]: unknown;
+}
+
+export interface ZaperPortfolio {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  name?: string;
+  [k: string]: unknown;
+}
+
+export interface ZaperTemplate {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  name?: string;
+  body?: string;
+  language?: string;
+  status?: string;
+  [k: string]: unknown;
+}
+
+export interface ZaperSession {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  contactId?: string;
+  status?: string;
+  [k: string]: unknown;
+}
+
+export interface ZaperMessage {
+  id: string;
+  createdAt?: string;
+  updatedAt?: string;
+  from?: string;
+  to?: string;
+  text?: string;
+  type?: string;
+  status?: string;
+  [k: string]: unknown;
+}
+
+export interface ZaperPanel {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  name?: string;
+  [k: string]: unknown;
+}
+
+export interface ZaperChannel {
+  id: string;
+  createdAt?: string;
+  updatedAt?: string;
+  number?: string;
+  name?: string;
+  [k: string]: unknown;
 }
 
 // --- Webhooks -----------------------------------------------------------

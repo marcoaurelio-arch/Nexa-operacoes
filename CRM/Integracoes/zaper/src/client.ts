@@ -1,6 +1,8 @@
 import {
   CreateContactInput,
   MessageStatus,
+  PageQuery,
+  Paginated,
   SendMediaInput,
   SendMessageInput,
   SendTemplateInput,
@@ -8,10 +10,17 @@ import {
   UpdateContactInput,
   WebhookEventDescriptor,
   WebhookSubscription,
+  ZaperChannel,
   ZaperClientConfig,
   ZaperContact,
   ZaperError,
+  ZaperMessage,
+  ZaperPanel,
+  ZaperPortfolio,
   ZaperRequestOptions,
+  ZaperSession,
+  ZaperTag,
+  ZaperTemplate,
 } from "./types.js";
 
 const DEFAULT_BASE_URL = "https://api.wts.chat";
@@ -160,6 +169,90 @@ export class ZaperClient {
       method: "POST",
       path: "/core/v1/webhook/subscription",
       body: input,
+    });
+  }
+
+  // --- Painel / CRM (kanban) -------------------------------------------
+
+  listPanels(query: PageQuery = {}): Promise<Paginated<ZaperPanel>> {
+    return this.request<Paginated<ZaperPanel>>({
+      path: "/crm/v1/panel",
+      query: query as Record<string, string | number | boolean | undefined>,
+    });
+  }
+
+  getPanel(id: string): Promise<ZaperPanel> {
+    return this.request<ZaperPanel>({
+      path: `/crm/v1/panel/${encodeURIComponent(id)}`,
+    });
+  }
+
+  // --- Sessões / Atendimentos ------------------------------------------
+
+  listSessions(
+    query: PageQuery & { contactId?: string; status?: string } = {},
+  ): Promise<Paginated<ZaperSession>> {
+    return this.request<Paginated<ZaperSession>>({
+      path: "/chat/v1/session",
+      query: query as Record<string, string | number | boolean | undefined>,
+    });
+  }
+
+  getSession(id: string): Promise<ZaperSession> {
+    return this.request<ZaperSession>({
+      path: `/chat/v1/session/${encodeURIComponent(id)}`,
+    });
+  }
+
+  // --- Templates -------------------------------------------------------
+
+  listTemplates(query: PageQuery = {}): Promise<Paginated<ZaperTemplate>> {
+    return this.request<Paginated<ZaperTemplate>>({
+      path: "/chat/v1/template",
+      query: query as Record<string, string | number | boolean | undefined>,
+    });
+  }
+
+  // --- Tags ------------------------------------------------------------
+
+  /** Tags retornam ARRAY direto, sem envelope paginado. */
+  listTags(): Promise<ZaperTag[]> {
+    return this.request<ZaperTag[]>({ path: "/core/v1/tag" });
+  }
+
+  // --- Portfolios ------------------------------------------------------
+
+  listPortfolios(query: PageQuery = {}): Promise<Paginated<ZaperPortfolio>> {
+    return this.request<Paginated<ZaperPortfolio>>({
+      path: "/core/v1/portfolio",
+      query: query as Record<string, string | number | boolean | undefined>,
+    });
+  }
+
+  // --- Mensagens (listar) ----------------------------------------------
+
+  listMessages(
+    query: PageQuery & {
+      contactId?: string;
+      sessionId?: string;
+      from?: string;
+      to?: string;
+    } = {},
+  ): Promise<Paginated<ZaperMessage>> {
+    return this.request<Paginated<ZaperMessage>>({
+      path: "/chat/v1/message",
+      query: query as Record<string, string | number | boolean | undefined>,
+    });
+  }
+
+  // --- Canais ----------------------------------------------------------
+
+  listChannels(
+    query: PageQuery = {},
+  ): Promise<Paginated<ZaperChannel> | ZaperChannel[]> {
+    return this.request<Paginated<ZaperChannel> | ZaperChannel[]>({
+      path: "/core/v1/channel",
+      query: query as Record<string, string | number | boolean | undefined>,
     });
   }
 
