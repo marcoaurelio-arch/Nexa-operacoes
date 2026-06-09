@@ -14,7 +14,8 @@
     "dev": "tsx watch src/webhooks.ts",
     "start": "node dist/webhooks.js",
     "test": "node --test --import tsx tests/**/*.test.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "discover": "tsx src/scripts/discover-endpoints.ts"
   },
   "dependencies": {
     "fastify": "^4.28.0"
