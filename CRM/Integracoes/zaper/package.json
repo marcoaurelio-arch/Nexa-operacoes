@@ -1,0 +1,32 @@
+{
+  "name": "@nexa/zaper-integration",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Integração bidirecional Nexa ↔ Zaper Chat",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/webhooks.ts",
+    "start": "node dist/webhooks.js",
+    "test": "node --test --import tsx tests/**/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "discover": "tsx src/scripts/discover-endpoints.ts",
+    "discover:panel": "tsx src/scripts/discover-panel.ts",
+    "webhooks:test": "tsx src/scripts/test-webhook.ts",
+    "webhooks:cleanup": "tsx src/scripts/cleanup-webhooks.ts",
+    "webhooks:watch": "tsx src/scripts/watch-webhook.ts"
+  },
+  "dependencies": {
+    "fastify": "^4.28.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.0"
+  }
+}

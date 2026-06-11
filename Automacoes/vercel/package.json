@@ -1,0 +1,24 @@
+{
+  "name": "@nexa/vercel-integration",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cliente Node+TS para Vercel REST API",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --import tsx tests/**/*.test.ts",
+    "sync-zaper-env": "tsx src/scripts/sync-zaper-env.ts",
+    "sync-zaper-env:dry": "tsx src/scripts/sync-zaper-env.ts --dry-run"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.0"
+  }
+}
