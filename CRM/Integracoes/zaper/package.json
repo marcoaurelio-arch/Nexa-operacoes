@@ -18,7 +18,8 @@
     "discover": "tsx src/scripts/discover-endpoints.ts",
     "discover:panel": "tsx src/scripts/discover-panel.ts",
     "webhooks:test": "tsx src/scripts/test-webhook.ts",
-    "webhooks:cleanup": "tsx src/scripts/cleanup-webhooks.ts"
+    "webhooks:cleanup": "tsx src/scripts/cleanup-webhooks.ts",
+    "webhooks:watch": "tsx src/scripts/watch-webhook.ts"
   },
   "dependencies": {
     "fastify": "^4.28.0"
